@@ -32,27 +32,26 @@ public class ContentImageSwitcher extends ImageSwitcher implements ImageSwitcher
 	private int curIndex = 0;
 
 
-
-
 	public ContentImageSwitcher(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init(context);
 	}
+
 	public ContentImageSwitcher(Context context) {
 		super(context);
 		init(context);
 
 	}
 
-	public void init(Context context){
+	public void init(Context context) {
 		this.context = context;
 		setInAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_in_bottom));
 		setOutAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_out_up));
-		mhandler = new Handler(){
+		mhandler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				super.handleMessage(msg);
-				switch (msg.what){
+				switch (msg.what) {
 					case UPDATE_IMAGE:
 						updateImageView();
 						break;
@@ -62,31 +61,41 @@ public class ContentImageSwitcher extends ImageSwitcher implements ImageSwitcher
 		setFactory(this);
 	}
 
-	public void setImages(List<Drawable> datas){
+	public void setCurIndex(int index) {
+		if (index < Images.size()) {
+			curIndex = index;
+			setImageDrawable(Images.get(curIndex));
+		}
+
+	}
+
+	public void setImages(List<Drawable> datas) {
 		this.Images = datas;
 	}
 
 
-	public void start(){
+	public void start() {
 		start(DEFAULT_DURTION);
 	}
 
-	public void start(int time){
-		if(timer == null ){
+	public void start(int time) {
+		if (timer == null) {
 			timer = new Timer();
 		}
-		timer.schedule(new timerTask(), 1,time);
+		timer.schedule(new timerTask(), 1, time);
 	}
-	public void stopDelay(int time){
+
+	public void stopDelay(int time) {
 		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				stop();
 			}
-		},time);
+		}, time);
 	}
-	public void stop(){
-		if(timer != null){
+
+	public void stop() {
+		if (timer != null) {
 			timer.cancel();
 			timer = null;
 		}
@@ -101,14 +110,16 @@ public class ContentImageSwitcher extends ImageSwitcher implements ImageSwitcher
 			msg.what = UPDATE_IMAGE;
 			mhandler.sendMessage(msg);
 		}
-	};
+	}
 
-	public void updateImageView(){
-		if(Images != null && Images.size() > 0){
-			if(curIndex < Images.size()){
+	;
+
+	public void updateImageView() {
+		if (Images != null && Images.size() > 0) {
+			if (curIndex < Images.size()) {
 				setImageDrawable(Images.get(curIndex));
 				curIndex++;
-				if(curIndex >= Images.size()){
+				if (curIndex >= Images.size()) {
 					curIndex = 0;
 				}
 			}
@@ -119,7 +130,7 @@ public class ContentImageSwitcher extends ImageSwitcher implements ImageSwitcher
 	@Override
 	public View makeView() {
 		ImageView iv = new ImageView(context);
-		iv.setScaleType(ImageView.ScaleType.CENTER);
+		iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
 		return iv;
 	}
 }

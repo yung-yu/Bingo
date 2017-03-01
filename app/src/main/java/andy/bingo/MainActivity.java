@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 import java.util.Arrays;
+import java.util.List;
 
 import andy.bingo.compoment.ContentImageSwitcher;
 
@@ -41,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
 							for (ContentImageSwitcher imageSwitcher : imageSwitchers) {
 								imageSwitcher.stop();
 								try {
-									Thread.sleep((long) (100*count));
-									count *= 1.2;
+									Thread.sleep((long) (10*count));
+									count = (int)(Math.random()* 100)+1;
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
@@ -60,27 +61,49 @@ public class MainActivity extends AppCompatActivity {
 
 					button.setEnabled(false);
 				} else {
-
-					for (ContentImageSwitcher imageSwicher : imageSwitchers) {
-						imageSwicher.start(100);
-					}
-					isRunning = true;
-					button.setText("stop");
+					new Thread(){
+						@Override
+						public void run() {
+							super.run();
+							float count = 1;
+							for (ContentImageSwitcher imageSwitcher : imageSwitchers) {
+								imageSwitcher.start(200);
+								try {
+									Thread.sleep((long) (1*count));
+									count = (int)(Math.random()* 100)+1;
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+							}
+							runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									isRunning = true;
+									button.setText("stop");
+									button.setEnabled(true);
+								}
+							});
+						}
+					}.start();
 				}
 			}
 		});
+		int i = 0;
+		List<Drawable> images = Arrays.asList(new Drawable[]{
+				getResources().getDrawable(R.drawable.image1),
+				getResources().getDrawable(R.drawable.image2),
+				getResources().getDrawable(R.drawable.image3),
+				getResources().getDrawable(R.drawable.image4),
+				getResources().getDrawable(R.drawable.image5),
+				getResources().getDrawable(R.drawable.image6),
+				getResources().getDrawable(R.drawable.image7),
+				getResources().getDrawable(R.drawable.image8),
+				getResources().getDrawable(R.drawable.image9)
+		});
 		for (ContentImageSwitcher imageSwitcher : imageSwitchers) {
-			imageSwitcher.setImages(Arrays.asList(new Drawable[]{
-					getResources().getDrawable(android.R.drawable.ic_menu_add),
-					getResources().getDrawable(android.R.drawable.arrow_up_float),
-					getResources().getDrawable(android.R.drawable.ic_media_next),
-					getResources().getDrawable(android.R.drawable.ic_menu_call),
-					getResources().getDrawable(android.R.drawable.ic_menu_camera),
-					getResources().getDrawable(android.R.drawable.ic_media_pause),
-					getResources().getDrawable(android.R.drawable.ic_menu_delete),
-					getResources().getDrawable(android.R.drawable.ic_menu_save),
-					getResources().getDrawable(android.R.drawable.ic_media_play)
-			}));
+			imageSwitcher.setImages(images);
+			imageSwitcher.setCurIndex(i);
+			i++;
 		}
 
 	}
