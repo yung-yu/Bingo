@@ -1,6 +1,7 @@
 package andy.bingo.compoment;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
@@ -24,12 +25,13 @@ import andy.bingo.R;
 
 public class ContentImageSwitcher extends ImageSwitcher implements ImageSwitcher.ViewFactory {
 	private Context context;
-	private List<Drawable> Images;
+	private List<Bitmap> Images;
 	private Handler mhandler;
 	private static final int DEFAULT_DURTION = 1000;
 	private static final int UPDATE_IMAGE = 1;
 	private Timer timer;
 	private int curIndex = 0;
+	private ImageView iv;
 
 
 	public ContentImageSwitcher(Context context, AttributeSet attrs) {
@@ -64,12 +66,16 @@ public class ContentImageSwitcher extends ImageSwitcher implements ImageSwitcher
 	public void setCurIndex(int index) {
 		if (index < Images.size()) {
 			curIndex = index;
-			setImageDrawable(Images.get(curIndex));
+			setImageBitmap(Images.get(curIndex));
 		}
 
 	}
-
-	public void setImages(List<Drawable> datas) {
+	public void setImageBitmap(Bitmap bmp){
+		ImageView image = (ImageView)this.getNextView();
+		image.setImageBitmap(bmp);
+		showNext();
+	}
+	public void setImages(List<Bitmap> datas) {
 		this.Images = datas;
 	}
 
@@ -117,7 +123,7 @@ public class ContentImageSwitcher extends ImageSwitcher implements ImageSwitcher
 	public void updateImageView() {
 		if (Images != null && Images.size() > 0) {
 			if (curIndex < Images.size()) {
-				setImageDrawable(Images.get(curIndex));
+				setImageBitmap(Images.get(curIndex));
 				curIndex++;
 				if (curIndex >= Images.size()) {
 					curIndex = 0;
@@ -129,7 +135,8 @@ public class ContentImageSwitcher extends ImageSwitcher implements ImageSwitcher
 
 	@Override
 	public View makeView() {
-		ImageView iv = new ImageView(context);
+
+		iv = new ImageView(context);
 		iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
 		return iv;
 	}

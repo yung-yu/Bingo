@@ -1,20 +1,26 @@
 package andy.bingo;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import andy.bingo.compoment.ContentImageSwitcher;
+import andy.bingo.utils.BitmapUtil;
 
 public class MainActivity extends AppCompatActivity {
     private ContentImageSwitcher[] imageSwitchers = new ContentImageSwitcher[9];
 	private Button button;
 	private boolean isRunning = false;
+	int stopPinter = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,32 +40,14 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				if (isRunning) {
-					new Thread(){
-						@Override
-						public void run() {
-							super.run();
-							float count = 1;
-							for (ContentImageSwitcher imageSwitcher : imageSwitchers) {
-								imageSwitcher.stop();
-								try {
-									Thread.sleep((long) (10*count));
-									count = (int)(Math.random()* 100)+1;
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-							}
-							runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									isRunning = false;
-									button.setText("start");
-									button.setEnabled(true);
-								}
-							});
-						}
-					}.start();
 
-					button.setEnabled(false);
+					if(stopPinter < imageSwitchers.length){
+						imageSwitchers[stopPinter].stop();
+						stopPinter++;
+					} else {
+						isRunning = false;
+						button.setText("start");
+					}
 				} else {
 					new Thread(){
 						@Override
@@ -79,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 								@Override
 								public void run() {
 									isRunning = true;
+									stopPinter = 0;
 									button.setText("stop");
 									button.setEnabled(true);
 								}
@@ -88,22 +77,28 @@ public class MainActivity extends AppCompatActivity {
 				}
 			}
 		});
-		int i = 0;
-		List<Drawable> images = Arrays.asList(new Drawable[]{
-				getResources().getDrawable(R.drawable.image1),
-				getResources().getDrawable(R.drawable.image2),
-				getResources().getDrawable(R.drawable.image3),
-				getResources().getDrawable(R.drawable.image4),
-				getResources().getDrawable(R.drawable.image5),
-				getResources().getDrawable(R.drawable.image6),
-				getResources().getDrawable(R.drawable.image7),
-				getResources().getDrawable(R.drawable.image8),
-				getResources().getDrawable(R.drawable.image9)
+
+		List<Integer> images = Arrays.asList(new Integer[]{
+				R.drawable.image1,
+				R.drawable.image2,
+				R.drawable.image3,
+				R.drawable.image4,
+				R.drawable.image5,
+				R.drawable.image6,
+				R.drawable.image7,
+				R.drawable.image8,
+				R.drawable.image9
 		});
+		List<Bitmap> bitmaps = new ArrayList<>();
+		for (int i =0 ; i< images.size();i++){
+			Bitmap bmp = BitmapUtil.decodeSampledBitmapFromResource(getResources(), images.get(i), 100, 100);
+			bitmaps.add(bmp);
+		}
+		int i = 0;
 		for (ContentImageSwitcher imageSwitcher : imageSwitchers) {
-			imageSwitcher.setImages(images);
+			imageSwitcher.setImages(bitmaps);
 			imageSwitcher.setCurIndex(i);
-			i++;
+
 		}
 
 	}
